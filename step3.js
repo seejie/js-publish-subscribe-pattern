@@ -11,13 +11,16 @@ const eventHub = {
   off: function (evName) {
     this.eventList[evName] = []
   },
-  all: function (args) {
+  notify: function (args) {
     let x = this.eventList
     for (let attr in x) {
       for (let i = 0, fn; fn = x[attr][i++];) {
         fn(args)
       }
     }
+  },
+  clear: function () {
+    this.eventList = {}
   }
 }
 
@@ -28,7 +31,13 @@ eventHub.on('hi', (name) => log(name))
 eventHub.emit('hi', 'seejie')
 eventHub.on('hi', (name) => log(name))
 eventHub.on('hi2', (name) => log(name))
-eventHub.all('hey')
+eventHub.notify('hey')
 eventHub.emit('hi', 'world')
 eventHub.off('hi')
 eventHub.emit('hi', 'wow')
+
+eventHub.on('hi', (name) => log(name))
+eventHub.on('hi', (name) => log(name))
+eventHub.on('hi2', (name) => log(name))
+eventHub.clear()
+eventHub.notify('hey')
