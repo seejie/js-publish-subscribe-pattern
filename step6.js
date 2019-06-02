@@ -35,4 +35,5 @@ log(eventHub.eventList)
 eventHub.emit('hi', 'world')
 eventHub.notify('hi')
 
-// 
+// 至此完成了最简化的发布-订阅模式
+// 下一步简单模拟vue eventBus的实践

@@ -59,3 +59,8 @@ setTimeout(_=>{
   console.log('trigger 2nd')
   componentB.trigger(5)
 }, 1000)
+
+// eventHub对象可以看做为vue里的eventBus对象
+// 之所以vue实例可以直接调用this.$on(),this.$emit()
+// 应该是因为vue使用了另一设计模式：代理模式
+// 将this.eventBus.$on()代理到this.$on()

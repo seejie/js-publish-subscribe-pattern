@@ -49,23 +49,49 @@ const componentA = {
   }
 }
 
-function proxy () {
-  const dataArr = Object.keys(componentA.data())
-  const methodsArr = Object.keys(componentA.methods)
-  for(let i = 0, len = dataArr.length; i < len; i++) {
-    componentA[dataArr[i]] = componentA.data()[dataArr[i]]
-  }
-  for(let i = 0, len = methodsArr.length; i < len; i++) {
-    componentA[methodsArr[i]] = componentA.methods[methodsArr[i]]
-  }
+// function proxy () {
+//   const dataArr = Object.keys(componentA.data())
+//   const methodsArr = Object.keys(componentA.methods)
+//   for(let i = 0, len = dataArr.length; i < len; i++) {
+//     componentA[dataArr[i]] = componentA.data()[dataArr[i]]
+//   }
+//   for(let i = 0, len = methodsArr.length; i < len; i++) {
+//     componentA[methodsArr[i]] = componentA.methods[methodsArr[i]]
+//   }
+// }
+// proxy()
+
+
+const sharedPropertyDefinition = {
+  enumerable: true,
+  configurable: true,
+  get: undefined,
+  set: undefined
 }
 
-proxy()
+function proxy (target, sourceKey, key) {
+  sharedPropertyDefinition.get = function proxyGetter () {
+    return this[sourceKey][key]
+  }
+  sharedPropertyDefinition.set = function proxySetter (val) {
+    this[sourceKey][key] = val
+  }
+  Object.defineProperty(target, key, sharedPropertyDefinition)
+}
+
+function loop () {
+  const methodsArr = Object.keys(componentA.methods)
+  for(let i = 0, len = methodsArr.length; i < len; i++) {
+    proxy(componentA, 'methods', methodsArr[i])
+  }
+}
+loop()
+
 componentA.created()
 
 const componentB = {
   trigger: val => {
-    eventHub.emit('data',val )
+    eventHub.emit('data', val)
   }
 }
 
@@ -76,21 +102,3 @@ setTimeout(_=>{
   componentB.trigger(5)
 }, 1000)
 
-
-
-// const sharedPropertyDefinition = {
-//   enumerable: true,
-//   configurable: true,
-//   get: noop,
-//   set: noop
-// }
-
-// export function proxy (target: Object, sourceKey: string, key: string) {
-//   sharedPropertyDefinition.get = function proxyGetter () {
-//     return this[sourceKey][key]
-//   }
-//   sharedPropertyDefinition.set = function proxySetter (val) {
-//     this[sourceKey][key] = val
-//   }
-//   Object.defineProperty(target, key, sharedPropertyDefinition)
-// }
