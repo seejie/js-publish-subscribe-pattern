@@ -10,65 +10,34 @@ const eventHub = {
   },
   off: function (evName) {
     this.eventList[evName] = []
-  }
-}
-
-const componentA = {
-  name: 'A',
-  data () {
-    return {
-      num: 5
+  },
+  notify: function (args) {
+    let x = this.eventList
+    for (let attr in x) {
+      for (let i = 0, fn; fn = x[attr][i++];) {
+        fn(args)
+      }
     }
   },
-  methods: {
-    listen: function () {
-      console.log('listen event ')
-      eventHub.on('data', val => {
-        this.update(val)
-      })
-    }
-  },
-  created: function () {
-    this.listen(this)
-    setTimeout(_=>{
-      console.log('A destroyed')
-      this.destroyed()
-    }, 0)
-  },
-  update: function (data) {
-    console.log('updated ' + this.name + ' => ' + this.num * data)
-  },
-  destroyed: function () {
-    console.log('remove event')
-    eventHub.off('data')
+  clear: function () {
+    this.eventList = {}
   }
 }
 
-function proxy () {
-  const dataArr = Object.keys(componentA.data())
-  const methodsArr = Object.keys(componentA.methods)
-  for(let i = 0, len = dataArr.length; i < len; i++) {
-    componentA[dataArr[i]] = componentA.data()[dataArr[i]]
-  }
-  for(let i = 0, len = methodsArr.length; i < len; i++) {
-    componentA[methodsArr[i]] = componentA.methods[methodsArr[i]]
-  }
-}
+const log = console.log
+log.bind(console)
 
-proxy()
+eventHub.on('hi', (name) => log(name))
+eventHub.emit('hi', 'seejie')
+eventHub.on('hi', (name) => log(name))
+eventHub.on('hi2', (name) => log(name))
+eventHub.notify('hey')
+eventHub.emit('hi', 'world')
+eventHub.off('hi')
+eventHub.emit('hi', 'wow')
 
-componentA.created()
-
-const componentB = {
-  trigger: val => {
-    eventHub.emit('data',val )
-  }
-}
-
-console.log('trigger 1th')
-componentB.trigger(3)
-setTimeout(_=>{
-  console.log('trigger 2nd')
-  componentB.trigger(5)
-}, 1000)
-
+eventHub.on('hi', (name) => log(name))
+eventHub.on('hi', (name) => log(name))
+eventHub.on('hi2', (name) => log(name))
+eventHub.clear()
+eventHub.notify('hey')
