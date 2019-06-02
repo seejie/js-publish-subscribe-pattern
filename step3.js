@@ -1,5 +1,10 @@
+// 发布-订阅通用实现模型
+
+// 事件中心，vue中叫eventBus事件总线
 const eventHub = {
+  // 事件列表
   eventList: {},
+  // 订阅
   on: function (evName, fn) {
     if (!this.eventList[evName]) {
       this.eventList[evName] = [fn]
@@ -7,25 +12,20 @@ const eventHub = {
       this.eventList[evName].push(fn)
     }
   },
+  // 发布
   emit: function (evName, args) {
     if(!this.eventList[evName]) return
     for (let i = 0, fn; fn = this.eventList[evName][i++];) {
       fn.call(this, args)
     }
-  },
-  off: function (evName) {
-    for (let attr in this.eventList) {
-      if (attr === evName) {
-        delete this.eventList[evName]
-        break
-      }
-    }
   }
 }
 
-eventHub.on('hi', (name) => console.log(name))
+const a = name => console.log(name)
+eventHub.on('hi', a)
 eventHub.emit('hi', 'seejie')
 eventHub.on('hi', (name) => console.log(name))
 eventHub.emit('hi', 'world')
-eventHub.off('hi')
-eventHub.emit('hi', 'hey')
+
+// 思考：
+// 添加取消订阅
